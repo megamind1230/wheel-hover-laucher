@@ -1,0 +1,58 @@
+#+title: Wheel Hover Launcher — Bugs
+#+author: hassan24641@gmail.com
+#+options: toc:nil
+
+Known bugs and proposed fixes. Move fixed items to [[file:changelog.org][changelog.org]] and mark
+them done in [[file:plans-and-todos.org][plans-and-todos.org]].
+
+* Open
+
+** DOC-001: README path / name drift (fixed 2026-11-13)
+
+- Symptom: README.org documented ~~/.config/wheel-launcher/apps.json~ and
+  ~~/dev-new/wheel-hover-laucher/~; code and disk use
+  ~wheel-hover-launcher~ and ~~/dev/wheel-hover-laucher~.
+- Impact: users create/edit the wrong config file; launcher reads an
+  empty/missing file and shows an empty wheel.
+- Fix applied: README.org updated to ~wheel-hover-launcher~ and the real
+  project path everywhere; README.md deleted so only .org remains.
+- Follow-up: GlobalShortcut / layer namespace / log prefix also renamed
+  to ~wheel-hover-launcher~ (user must update Hyprland bind).
+
+** CODE-001: No file logging under ~/magnus/wheel-hover-launcher/logs/
+
+- Symptom: only Quickshell's ~log.qslog~ is available; hard to debug
+  after a session ends.
+- Impact: lost diagnostics for launch failures and bad ~apps.json~.
+- Fix plan: add a small logger (append timestamped lines) used for
+  config parse errors, launch attempts, and shortcut toggles; rotate or
+  truncate logs to keep the directory small. See plans-and-todos.org.
+
+** CODE-002: Wheel.qml is a god component
+
+- Symptom: one Item owns canvas paint, mouse input, hover/idle timers,
+  keyboard mapping, and process launch (~Wheel.qml~).
+- Impact: hard to unit-test hit detection; violates single-responsibility
+  (SOLID / clean code reminder).
+- Fix plan: extract pure helpers (e.g. ~sectorAt(cx, cy, x, y, count,
+  inner, outer)~ and config validation) into a plain JS / QML module so
+  tests can run without a window; keep rendering in Wheel.qml.
+
+** CODE-003: Invalid ~exec~ still attempted; no user feedback
+
+- Symptom: ~launch()~ silently returns if ~app.exec~ missing; bad
+  commands fail inside ~sh -c~ with no visible error.
+- Impact: user clicks a sector and nothing happens.
+- Fix plan: log failures to the magnus logs path; optionally flash the
+  sector or show a brief toast on failure.
+
+** CODE-004: Homerow not rebindable without custom keys (fixed 2026-11-14)
+
+- Symptom: fixed ~keys~ list only; apps beyond 10 were mouse-only with
+  no way to assign a shortcut.
+- Fix applied: optional ~key~ field per app in ~apps.json~; resolution
+  in ~KeyMap.js~ (custom wins, homerow fallback if free, else mouse-only).
+
+* Closed
+
+None yet beyond DOC-001 (docs-only).

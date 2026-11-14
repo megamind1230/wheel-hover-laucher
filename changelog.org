@@ -1,0 +1,64 @@
+#+title: Wheel Hover Launcher — Changelog
+#+author: hassan24641@gmail.com
+#+options: toc:nil
+
+All notable changes. Project name: ~wheel-hover-launcher~.
+
+* 2026-11-13
+
+** Added
+
+- plans-and-todos.org — task tracking (~- [ ]~ / ~- [X]~ / ~- [-]~)
+- bugs.org — bug list with fixes
+- changelog.org — this file
+- .gitignore — ignore editor/OS junk and local logs
+- Per-app custom launch key: ~apps.json~ ~"key": "t"~; ~KeyMap.js~
+  resolves custom vs positional homerow (duplicates: first wins);
+  ~tests/keymap.test.js~ (11 cases, ~node tests/keymap.test.js~)
+
+** Changed
+
+- README.org: config path unified to
+  ~~/.config/wheel-hover-launcher/apps.json~
+- README.org: project path corrected to ~~/dev/wheel-hover-laucher~
+- All identifiers renamed to ~wheel-hover-launcher~ for one convention:
+  GlobalShortcut (~quickshell:wheel-hover-launcher~), layer-shell
+  namespace, log prefix
+- Documented logging target: ~/magnus/wheel-hover-launcher/logs/
+  (implementation pending)
+
+** Removed
+
+- README.md — stale duplicate; .org is the single docs format
+
+** Migration
+
+- Update Hyprland bind to ~quickshell:wheel-hover-launcher~ and reload
+  (~hyprctl reload~); verify with ~hyprctl globalshortcuts~.
+
+* 2026-11-14
+
+** Changed
+
+- Hover behavior: plain hover is highlight-only (never launches).
+  Dwell auto-launch runs only while **Ctrl or Alt is held**. Releasing
+  the modifier cancels a pending launch. Ctrl/Alt + click still
+  launches explicitly.
+- Removed ~autoLaunch~ config flag — dwell no longer gated by it
+  (plain hover cannot launch, so the old safety flag was blocking the
+  only hover-launch path). Ctrl/Alt + hover always dwells.
+- Default ~hoverDelay~ 500ms → **250ms** (snappier dwell).
+- KeyMap.js: ~shouldDwell(modifierHeld, highlightIndex)~ (no
+  autoLaunch arg); shell.qml forwards Ctrl/Alt press/release to
+  ~wheel.setDwellModifier~.
+
+** Added
+
+- plans-and-todos.org: hover fix done; future list (spawn points,
+  case-sensitive ~t~/~T~ keys, type-ahead, clipboard/actions wheel,
+  and maybe animations/theme/sound/drag/sub-actions)
+- tests for ~shouldDwell~ (in ~tests/keymap.test.js~)
+
+** Docs
+
+- README.org usage table updated for modifier-gated dwell

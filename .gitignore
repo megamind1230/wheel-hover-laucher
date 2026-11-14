@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# local logs (canonical debug logs live in ~/magnus/wheel-hover-launcher/logs/)
+logs/
+*.qslog
+
+# never commit local runtime / secrets
+.env
+*.local

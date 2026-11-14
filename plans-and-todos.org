@@ -1,0 +1,80 @@
+#+title: Wheel Hover Launcher — Plans & Todos
+#+author: hassan24641@gmail.com
+#+options: toc:nil
+
+Project name (all conventions): ~wheel-hover-launcher~
+
+* Done
+
+- [X] Core radial wheel UI (annular sectors, Canvas paint)
+- [X] Polar hit detection (distance + atan2)
+- [X] Homerow keyboard launching (~a s d f g h j k l ;~)
+- [X] Hover highlight + optional debounced hover-to-launch
+- [X] Idle auto-close timer (key presses only)
+- [X] Global shortcut via ~hyprland_global_shortcuts_v1~
+- [X] ~apps.json~ hot-reload via ~FileView~
+- [X] XDG icon lookup with first-letter fallback
+- [X] Detached launch (~setsid -f~)
+- [X] README.org (features, tech stack, usage, structure at bottom)
+- [X] LICENSE (GPL-3.0)
+- [X] Unify config path to ~~/.config/wheel-hover-launcher/apps.json~
+- [X] Remove stale README.md (docs are .org only)
+- [X] Create plans-and-todos.org, bugs.org, changelog.org, .gitignore
+- [X] Per-app custom launch key in ~apps.json~ (~key~ field); custom beats
+      positional homerow; missing/empty falls back to homerow if free,
+      else mouse-only (KeyMap.js + tests/keymap.test.js)
+- [X] Hover select fix: plain hover = highlight only; dwell auto-launch only
+      while Ctrl/Alt held; releasing modifier cancels pending launch
+      (~shouldDwell~ + Keys press/release in shell.qml)
+- [X] Remove ~autoLaunch~ gate from dwell (Ctrl/Alt hover always dwells);
+      default ~hoverDelay~ 500 → 250ms
+
+* In progress
+
+- [-] Logging to ~/magnus/wheel-hover-launcher/logs/ for later debugging
+      (currently only Quickshell's default ~log.qslog~)
+
+* Todo
+
+** Docs / housekeeping
+
+- [ ] Keep all .org files updated on every change
+- [ ] Unit tests for polar hit detection and config parsing
+      (key resolution already covered by tests/keymap.test.js)
+- [ ] Periodic SOLID / clean-code refactor pass on Wheel.qml + shell.qml
+      (Wheel.qml mixes paint, input, timers, and launch — consider splitting)
+
+** Future features (decided)
+
+- [ ] Spawn points — nested wheels: sector opens a child wheel UI;
+      Esc / center pops back to parent; breadcrumb in center hub;
+      Ctrl/Alt dwell on a spawn sector leads to the child wheel
+- [ ] Case-sensitive keys — distinguish ~t~ vs ~T~ (Shift held);
+      ~"key": "T"~ means Shift+t; ~t~ and ~T~ are distinct bindings;
+      homerow defaults stay lowercase only
+- [ ] Type-ahead search: type to filter sectors while wheel is open
+- [ ] Clipboard / actions wheel — non-app entries (paste, screenshot, …)
+
+** Future features (maybe)
+
+- [ ] Animations (open/close, highlight tween)
+- [ ] Theme config (~theme.json~: colors, radii, icon size)
+- [ ] Launch sound feedback
+- [ ] Drag-to-select (hold LMB, sweep, release to launch)
+- [ ] Right-click sub-actions (Open / Pin / Edit)
+
+** Explicitly not planned
+
+- Multi-wheel keybinds, .desktop auto-import, recents/most-used,
+  command-palette free-typed shell
+
+** Housekeeping
+
+- [ ] Ask user before adding anything beyond the lists above
+
+* Notes
+
+- Directory name on disk is ~wheel-hover-laucher~ (typo); config,
+  shortcut, and docs all use ~wheel-hover-launcher~. Rename the
+  directory only if the user asks (breaks Hyprland ~-p~ path).
+- Never commit or write commit messages — user handles git.
