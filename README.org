@@ -4,6 +4,7 @@
 
 Radial (wheel-style) app launcher for Hyprland, built with Quickshell 0.3.x.
 
+[[file:screenshots/wheel-hover-launcher.png]]
 * Features
 
 - Radial menu drawn as annular sectors, opened with a single keybind.
