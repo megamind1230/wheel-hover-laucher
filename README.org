@@ -90,27 +90,34 @@ anything; only a steady hover with the modifier held reaches ~hoverDelay~
 * Configuration — apps.json
 
 Location: ~~/.config/wheel-hover-launcher/apps.json~
-
+example apps.json could be like
 #+begin_src json
-{
-    "hoverDelay": 250,
-    "idleTimeout": 5000,
-    "apps": [
-        { "name": "Terminal", "icon": "kitty", "exec": "kitty", "key": "t" },
-        { "name": "Browser", "icon": "firefox", "exec": "firefox", "key": "b" },
-        { "name": "Editor", "icon": "neovim", "exec": "kitty -e nvim" }
-    ]
-}
+  {
+  "hoverDelay": 250,
+  "idleTimeout": 5000,
+  "apps": [
+  { "name": "thunar", "icon": "org.xfce.thunar", "exec": "thunar ~", "key": "t" },
+  { "name": "anki", "icon": "", "exec": "kitty bash -c '/home/dt/anki-launcher-25.09-linux/anki'", "key": "1" },
+  { "name": "telegram", "icon": "org.telegram.desktop", "exec": "Telegram", "key": "2" },
+  { "name": "discord", "icon": "discord", "exec": "discord", "key": "3" },
+  { "name": "Switch Editor", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && editor-switcher'", "key": "e" },
+  { "name": "Custom Funcs", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && fuzzy_function'", "key": "f" },
+  { "name": "Custom Aliases", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && source ~/.bashrc-aliases && fuzzy_alias'", "key": "a" },
+  { "name": "Custom Scripts", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && scriptsRun'", "key": "s" }
+  ]
+  }
+
 #+end_src
 
-| Field         | Meaning                                                            |
-|---------------+--------------------------------------------------------------------|
-| ~hoverDelay~  | Ctrl/Alt dwell threshold in ms (default 250).                      |
-| ~idleTimeout~ | Close after this many ms without a key press (default 5000).       |
-| ~apps[].name~ | Label drawn under the icon.                                        |
+
+| Field         | Meaning                                                                    |
+|---------------+----------------------------------------------------------------------------|
+| ~hoverDelay~  | Ctrl/Alt dwell threshold in ms (default 250).                              |
+| ~idleTimeout~ | Close after this many ms without a key press (default 5000).               |
+| ~apps[].name~ | Label drawn under the icon.                                                |
 | ~apps[].icon~ | An XDG icon *theme name*. If missing, the first letter of ~name~ is drawn. |
-| ~apps[].exec~ | Shell command, launched as ~setsid -f <exec>~ (fully detached).    |
-| ~apps[].key~  | Optional single-char launch key (e.g. ~"t"~). Case-insensitive.     |
+| ~apps[].exec~ | Shell command, launched as ~setsid -f <exec>~ (fully detached).            |
+| ~apps[].key~  | Optional single-char launch key (e.g. ~"t"~). Case-insensitive.            |
 
 Key resolution (see ~KeyMap.js~):
 
