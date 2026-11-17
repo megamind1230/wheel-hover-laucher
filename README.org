@@ -11,8 +11,8 @@ built with Quickshell 0.3.x.
 * Quick start (new users)
 =BETTER CLONE IT IN ~/dev/ dir=
 #+begin_src sh
-git clone https://github.com/megamind1230/wheel-hover-laucher.git ~/dev/wheel-hover-laucher
-cd ~/dev/wheel-hover-laucher
+git clone https://github.com/megamind1230/wheel-hover-launcher.git ~/dev/wheel-hover-launcher
+cd ~/dev/wheel-hover-launcher
 ./install.sh
 #+end_src
 
@@ -58,7 +58,7 @@ reload / re-login, and press ~Super+X~.
    the ~hl.on("hyprland.start", function() ... end)~ block:
 
    #+begin_src lua
-   hl.exec_cmd("quickshell -p /home/dt/dev/wheel-hover-laucher")
+   hl.exec_cmd("quickshell -p /home/dt/dev/wheel-hover-launcher")
    #+end_src
 
    The window is created hidden, so nothing is visible until you invoke it.
@@ -96,7 +96,7 @@ EWMH fullscreen and the i3 rule below enforces it.
    autostart mechanism):
 
    #+begin_src i3
-   exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-laucher
+   exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-launcher
    #+end_src
 
 2. Bind the shortcut via the IPC toggle (X11 has no Wayland
@@ -105,7 +105,7 @@ EWMH fullscreen and the i3 rule below enforces it.
    (instance selection is per config path):
 
    #+begin_src i3
-   bindsym $mod+X exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-laucher ipc call wheel-hover-launcher toggle
+   bindsym $mod+X exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-launcher ipc call wheel-hover-launcher toggle
    #+end_src
 
 3. Window rules so the wheel covers everything and receives keyboard
@@ -286,7 +286,7 @@ switches.
 * Project structure
 
 #+begin_example
-~/dev/wheel-hover-laucher/
+~/dev/wheel-hover-launcher/
 ├── shell.qml           # window, config loading, global shortcut, key handling
 ├── Wheel.qml           # radial menu: sectors, polar hit detection, timers
 ├── KeyMap.js           # pure custom/homerow key resolution (unit-tested)

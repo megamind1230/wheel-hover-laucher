@@ -20,7 +20,7 @@ All notable changes. Project name: ~wheel-hover-launcher~.
 
 - README.org: config path unified to
   ~~/.config/wheel-hover-launcher/apps.json~
-- README.org: project path corrected to ~~/dev/wheel-hover-laucher~
+- README.org: project path corrected to ~~/dev/wheel-hover-launcher~
 - All identifiers renamed to ~wheel-hover-launcher~ for one convention:
   GlobalShortcut (~quickshell:wheel-hover-launcher~), layer-shell
   namespace, log prefix

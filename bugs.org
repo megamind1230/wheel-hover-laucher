@@ -10,8 +10,8 @@ them done in [[file:plans-and-todos.org][plans-and-todos.org]].
 ** DOC-001: README path / name drift (fixed 2026-11-13)
 
 - Symptom: README.org documented ~~/.config/wheel-launcher/apps.json~ and
-  ~~/dev-new/wheel-hover-laucher/~; code and disk use
-  ~wheel-hover-launcher~ and ~~/dev/wheel-hover-laucher~.
+  ~~/dev-new/wheel-hover-launcher/~; code and disk use
+  ~wheel-hover-launcher~ and ~~/dev/wheel-hover-launcher~.
 - Impact: users create/edit the wrong config file; launcher reads an
   empty/missing file and shows an empty wheel.
 - Fix applied: README.org updated to ~wheel-hover-launcher~ and the real
