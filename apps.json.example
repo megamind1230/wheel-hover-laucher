@@ -1,0 +1,14 @@
+{
+    "hoverDelay": 250,
+    "idleTimeout": 5000,
+    "apps": [
+        { "name": "thunar", "icon": "org.xfce.thunar", "exec": "thunar ~", "key": "t" },
+        { "name": "anki", "icon": "", "exec": "kitty bash -c \"$HOME/anki-launcher-25.09-linux/anki\"", "key": "1" },
+        { "name": "telegram", "icon": "org.telegram.desktop", "exec": "Telegram", "key": "2" },
+        { "name": "discord", "icon": "discord", "exec": "discord", "key": "3" },
+        { "name": "Switch Editor", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && editor-switcher'", "key": "e" },
+        { "name": "Custom Funcs", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && fuzzy_function'", "key": "f" },
+        { "name": "Custom Aliases", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && source ~/.bashrc-aliases && fuzzy_alias'", "key": "a" },
+        { "name": "Custom Scripts", "icon": "", "exec": "kitty bash -c 'source ~/.bashrc-functions && scriptsRun'", "key": "s" }
+    ]
+}

@@ -2,9 +2,32 @@
 #+author: hassan24641@gmail.com
 #+options: toc:nil
 
-Radial (wheel-style) app launcher for Hyprland, built with Quickshell 0.3.x.
+Radial (wheel-style) app launcher for Hyprland (Wayland) and i3 (X11),
+built with Quickshell 0.3.x.
 
 [[file:screenshots/wheel-hover-launcher.png]]
+[[file:screenshots/wheel-hover-launcher2.png]]
+
+* Quick start (new users)
+=BETTER CLONE IT IN ~/dev/ dir=
+#+begin_src sh
+git clone https://github.com/megamind1230/wheel-hover-laucher.git ~/dev/wheel-hover-laucher
+cd ~/dev/wheel-hover-laucher
+./install.sh
+#+end_src
+
+~install.sh~ (safe to re-run, no ~sudo~):
+
+- checks that Quickshell is installed;
+- creates ~~/.config/wheel-hover-launcher/~ and seeds ~apps.json~ from
+  ~apps.json.example~ (an existing config is never overwritten);
+- creates ~~magnus/wheel-hover-launcher/logs/~;
+- prints the exact autostart + keybind lines for Hyprland and i3.
+
+Then finish the wiring for your compositor: follow the [[*Setup][Setup]]
+(Hyprland, Wayland) or [[*X11 / i3 setup][X11 / i3 setup]] section below,
+reload / re-login, and press ~Super+X~.
+
 * Features
 
 - Radial menu drawn as annular sectors, opened with a single keybind.
@@ -14,17 +37,18 @@ Radial (wheel-style) app launcher for Hyprland, built with Quickshell 0.3.x.
 - Optional Ctrl/Alt hover-to-launch (dwell, default 250ms; plain hover never launches).
 - Idle auto-close after N ms without a key press.
 - User-editable app list in ~~/.config/wheel-hover-launcher/apps.json~, hot-reloaded on save.
-- Per-app icon from the XDG icon theme, with a first-letter fallback.
+- Per-app icon from the XDG icon theme (or a custom file path), with a
+  first-letter fallback.
 
 * Tech stack
 
-| Component  | Choice                                    |
-|------------+-------------------------------------------|
-| Compositor | Hyprland (Lua config)                     |
-| Shell      | Quickshell 0.3.x (QML / Qt 6)             |
-| Language   | QML (declarative, no build step)          |
-| Config     | JSON (~apps.json~)                        |
-| Layer      | Wayland ~wlr-layer-shell~ (overlay layer) |
+| Component  | Choice                                                                                        |
+|------------+-----------------------------------------------------------------------------------------------|
+| Compositor | Hyprland (Wayland) or i3 (X11)                                                                |
+| Shell      | Quickshell 0.3.x (QML / Qt 6)                                                                 |
+| Language   | QML (declarative, no build step)                                                              |
+| Config     | JSON (~apps.json~)                                                                            |
+| Layer      | Wayland ~wlr-layer-shell~ (overlay layer); normal fullscreen window (~FloatingWindow~) on X11 |
 
 * Setup
 
@@ -59,23 +83,63 @@ Radial (wheel-style) app launcher for Hyprland, built with Quickshell 0.3.x.
 
 4. Reload Hyprland (~hyprctl reload~) or re-login.
 
+* X11 / i3 setup
+
+The same QML runs on X11: a platform switch (~Loader~ on
+~Qt.platform.pluginName~) hosts the shared overlay content in a
+~FloatingWindow~ — a normal window type. (The Wayland ~PanelWindow~
+maps as ~_NET_WM_WINDOW_TYPE_DOCK~ on X11, which i3 never manages
+without struts, so it is only used on Wayland.) The window requests
+EWMH fullscreen and the i3 rule below enforces it.
+
+1. Start the shell once per login (i3 config ~exec~ line or your
+   autostart mechanism):
+
+   #+begin_src i3
+   exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-laucher
+   #+end_src
+
+2. Bind the shortcut via the IPC toggle (X11 has no Wayland
+   global-shortcut protocol). The ~-p~ flag is required: without it
+   ~quickshell ipc call~ cannot discover the running instance
+   (instance selection is per config path):
+
+   #+begin_src i3
+   bindsym $mod+X exec --no-startup-id quickshell -p /home/dt/dev/wheel-hover-laucher ipc call wheel-hover-launcher toggle
+   #+end_src
+
+3. Window rules so the wheel covers everything and receives keyboard
+   focus (needed for Esc / homerow keys). Quickshell sets an *empty
+   WM_CLASS* on X11, so match by exact window title instead of class:
+
+   #+begin_src i3
+   for_window [title="^quickshell$"] floating enable, fullscreen enable
+   #+end_src
+
+   (Installed in ~~/.config/i3/config~ already; see the "Wheel Hover
+   Launcher" block at the bottom.)
+
+4. Transparency (the 35% dim behind the wheel) requires a compositing
+   X server, e.g. ~picom~. Without one the dim area renders opaque
+   black.
+
 * Usage
 
 Sectors show a homerow key (~a s d f g h j k l ;~) or the per-app ~key~
 from ~apps.json~ when set (see Configuration).
 
-| Action                       | Result                         |
-|------------------------------+--------------------------------|
-| ~Super+X~                    | Toggle the wheel               |
-| Homerow or custom ~key~     | Launch that sector's app      |
-| Hover a sector               | Highlight only (no launch)    |
-| ~Ctrl~/~Alt~ + hover ≥ ~hoverDelay~ ms | Launch after dwell |
-| Release ~Ctrl~/~Alt~ during dwell | Cancels pending auto-launch |
-| ~Ctrl~/~Alt~ + left click    | Launch the highlighted app     |
-| ~Esc~                        | Close                          |
-| Click blank area / center    | Close                          |
-| Idle ≥ ~idleTimeout~ ms      | Close                          |
-| Plain left click on a sector | Nothing (no accidental launch) |
+| Action                                 | Result                         |
+|----------------------------------------+--------------------------------|
+| ~Super+X~                              | Toggle the wheel               |
+| Homerow or custom ~key~                | Launch that sector's app       |
+| Hover a sector                         | Highlight only (no launch)     |
+| ~Ctrl~/~Alt~ + hover ≥ ~hoverDelay~ ms | Launch after dwell             |
+| Release ~Ctrl~/~Alt~ during dwell      | Cancels pending auto-launch    |
+| ~Ctrl~/~Alt~ + left click              | Launch the highlighted app     |
+| ~Esc~                                  | Close                          |
+| Click blank area / center              | Close                          |
+| Idle ≥ ~idleTimeout~ ms                | Close                          |
+| Plain left click on a sector           | Nothing (no accidental launch) |
 
 The idle timer only counts *key presses* (and opening the wheel). Mouse
 movement and hovering do not keep it alive, so the wheel closes on its own if
@@ -133,13 +197,63 @@ Notes:
   invalid and the wheel renders empty (see [[file:bugs.org][bugs.org]]).
 - Icon names must match the theme. Use the name from the app's ~.desktop~ file
   (e.g. ~org.telegram.desktop~, ~org.xfce.thunar~). Wrong names fall back to a
-  letter.
+  letter. See [[*Icons][Icons]] for finding names and using custom icons.
 - To run a *bash function* (not a binary), wrap it in a terminal and source
   your functions file, e.g.:
   #+begin_src json
   { "name": "Switch Editor", "icon": "emacs",
     "exec": "kitty bash -c 'source ~/.bashrc-functions && editor-switcher'" }
   #+end_src
+
+* Icons
+
+~apps[].icon~ accepts an *XDG icon-theme name* (default) or a *file path*.
+
+** Finding the correct theme name
+
+The name is looked up in your active icon theme, falling back to
+~hicolor~. A wrong name silently falls back to the first letter of the
+app ~name~.
+
+- Most reliable — the ~Icon=~ line of the app's ~.desktop~ file:
+
+  #+begin_src sh
+  grep -i '^Icon=' /usr/share/applications/*.desktop \
+    ~/.local/share/applications/*.desktop 2>/dev/null | grep -i telegram
+  #+end_src
+
+- Browse / search all installed icons with a GUI:
+  ~gtk4-icon-browser~ (or ~gtk3-icon-browser~, ~pacman -S gtk4~).
+- Or search the filesystem (active theme dirs + the ~hicolor~ fallback):
+
+  #+begin_src sh
+  find /usr/share/icons ~/.local/share/icons ~/.icons \
+    -iname '*telegram*' 2>/dev/null
+  #+end_src
+
+** Custom icons for custom commands
+
+Since custom commands have no ~.desktop~ file, either point at a file
+directly (paths are supported since 2026-11-17) or install your icon as
+a theme icon.
+
+Direct path in ~apps.json~ (supported: ~~/rel~, ~/abs~, ~file://~ URLs;
+PNG and SVG):
+
+#+begin_src json
+{ "name": "Backup", "icon": "~/pics/backup.png", "exec": "..." }
+#+end_src
+
+Or install the icon into your personal theme dir and use its name:
+
+#+begin_src sh
+mkdir -p ~/.local/share/icons/hicolor/scalable/apps
+cp backup.svg ~/.local/share/icons/hicolor/scalable/apps/backup.svg
+#+end_src
+
+then set ~"icon": "backup"~ (PNG goes under ~hicolor/48x48/apps/~).
+That directory is always in the icon search path and survives theme
+switches.
 
 * How it works (short version)
 
@@ -178,6 +292,8 @@ Notes:
 ├── KeyMap.js           # pure custom/homerow key resolution (unit-tested)
 ├── tests/
 │   └── keymap.test.js  # node tests for KeyMap.js
+├── install.sh          # first-run setup: dirs, apps.json seed, config instructions
+├── apps.json.example   # example config, copied by install.sh into ~/.config/wheel-hover-launcher/
 ├── README.org          # this file
 ├── plans-and-todos.org # build plan / task tracking
 ├── bugs.org            # known bugs + fixes
@@ -185,6 +301,6 @@ Notes:
 ├── LICENSE             # GPL-3.0
 └── .gitignore
 
-~/.config/wheel-hover-launcher/apps.json   # user app list (outside the repo)
-~/magnus/wheel-hover-launcher/logs/        # debug logs (when implemented)
+~/.config/wheel-hover-launcher/apps.json   # user app list (seeded by install.sh; outside the repo)
+~/magnus/wheel-hover-launcher/logs/        # debug logs (created by install.sh; when implemented)
 #+end_example

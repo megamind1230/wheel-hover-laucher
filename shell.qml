@@ -5,30 +5,26 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 
 ShellRoot {
-    PanelWindow {
-        id: window
-        property bool open: false
+    id: root
+    property bool open: false
 
-        visible: open
-        color: "transparent"
+    // shared overlay content, hosted by whichever window type the platform gets
+    Component {
+        id: content
 
-        anchors {
-            left: true
-            right: true
-            top: true
-            bottom: true
-        }
-
-        // layer-shell: fullscreen overlay, grabs keyboard so Esc always works
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "wheel-hover-launcher"
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-        // keyboard grab target: Esc closes, homerow keys launch
         Item {
-            anchors.fill: parent
-            focus: window.open
+            focus: root.open
+
+            // on X11 the window must explicitly take keyboard focus when it
+            // opens, or Esc / homerow keys never reach the Keys handler
+            Connections {
+                target: root
+                function onOpenChanged() {
+                    if (root.open) forceActiveFocus()
+                }
+            }
+
+            // keyboard grab target: Esc closes, homerow keys launch
             Keys.onPressed: event => {
                 // Ctrl/Alt down while hovering → arm dwell launch
                 if (event.key === Qt.Key_Control || event.key === Qt.Key_Alt) {
@@ -37,7 +33,7 @@ ShellRoot {
                     return
                 }
                 if (event.key === Qt.Key_Escape) {
-                    window.open = false
+                    root.open = false
                     event.accepted = true
                     return
                 }
@@ -53,32 +49,84 @@ ShellRoot {
                     wheel.setDwellModifier(held)
                 }
             }
-        }
 
-        onOpenChanged: if (!open) wheel.reset()
-
-        // dim + click-outside-to-close
-        MouseArea {
-            anchors.fill: parent
-            onClicked: window.open = false
-
-            Rectangle {
+            // dim + click-outside-to-close
+            MouseArea {
                 anchors.fill: parent
-                color: Qt.rgba(0, 0, 0, 0.35)
+                onClicked: root.open = false
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(0, 0, 0, 0.35)
+                }
+            }
+
+            Wheel {
+                id: wheel
+                anchors.centerIn: parent
+                active: root.open
+                apps: appsFile.config.apps ?? []
+                hoverDelay: appsFile.config.hoverDelay ?? 250
+                idleTimeout: appsFile.config.idleTimeout ?? 5000
+
+                onActiveChanged: if (!active) reset()
+                onLaunched: root.open = false
+                onClosed: root.open = false
             }
         }
+    }
 
-        Wheel {
-            id: wheel
-            anchors.centerIn: parent
-            active: window.open
-            apps: appsFile.config.apps ?? []
-            hoverDelay: appsFile.config.hoverDelay ?? 250
-            idleTimeout: appsFile.config.idleTimeout ?? 5000
+    // Wayland: layer-shell panel (overlay, exclusive keyboard focus)
+    Component {
+        id: waylandWindow
 
-            onLaunched: window.open = false
-            onClosed: window.open = false
+        PanelWindow {
+            visible: root.open
+            color: "transparent"
+
+            anchors {
+                left: true
+                right: true
+                top: true
+                bottom: true
+            }
+
+            // layer-shell only exists on Wayland; on X11 the attached object is null
+            Component.onCompleted: if (this.WlrLayershell != null) {
+                this.WlrLayershell.layer = WlrLayer.Overlay
+                this.WlrLayershell.namespace = "wheel-hover-launcher"
+                this.WlrLayershell.exclusiveZone = -1
+                this.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
+            }
+
+            Loader {
+                anchors.fill: parent
+                sourceComponent: content
+            }
         }
+    }
+
+    // X11: PanelWindow maps as _NET_WM_WINDOW_TYPE_DOCK, which i3 never
+    // manages (no struts, fullscreen dock) — use a normal fullscreen window.
+    // i3 fullscreens it via: for_window [title="^quickshell$"] fullscreen enable
+    Component {
+        id: x11Window
+
+        FloatingWindow {
+            visible: root.open
+            fullscreen: true
+            color: "transparent"
+
+            Loader {
+                anchors.fill: parent
+                sourceComponent: content
+            }
+        }
+    }
+
+    Loader {
+        sourceComponent: Qt.platform.pluginName === "wayland"
+                         ? waylandWindow : x11Window
     }
 
     FileView {
@@ -106,6 +154,16 @@ ShellRoot {
     GlobalShortcut {
         name: "wheel-hover-launcher"
         description: "Toggle the wheel app launcher"
-        onPressed: window.open = !window.open
+        onPressed: root.open = !root.open
+    }
+
+    // X11/i3 toggle path (no global-shortcut protocol there):
+    //   bindsym $mod+X exec quickshell -p <config path> ipc call wheel-hover-launcher toggle
+    IpcHandler {
+        target: "wheel-hover-launcher"
+
+        function toggle() {
+            root.open = !root.open
+        }
     }
 }

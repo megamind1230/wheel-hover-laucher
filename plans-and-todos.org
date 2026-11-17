@@ -28,6 +28,11 @@ Project name (all conventions): ~wheel-hover-launcher~
       (~shouldDwell~ + Keys press/release in shell.qml)
 - [X] Remove ~autoLaunch~ gate from dwell (Ctrl/Alt hover always dwells);
       default ~hoverDelay~ 500 → 250ms
+- [X] X11 / i3 support: conditional ~WlrLayershell~ setup, ~focusable~,
+      ~IpcHandler~ toggle target; verified against XWayland (toggle,
+      Esc) — see changelog 2026-11-17
+- [X] i3 config installed (exec + ~$mod+X~ bind + title-based
+      ~for_window~ rule; WM_CLASS is empty on X11)
 
 * In progress
 

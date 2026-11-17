@@ -159,14 +159,35 @@ Item {
                     height: root.iconSize
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    readonly property bool hasIcon: modelData.icon !== undefined
-                        && Quickshell.hasThemeIcon(modelData.icon)
+                    // icon field: XDG theme name, or a file path
+                    // (/abs, ~/rel, file:// URL)
+                    readonly property string iconStr: modelData.icon || ""
+                    readonly property bool isPath: iconStr.startsWith("/")
+                        || iconStr.startsWith("~")
+                        || iconStr.startsWith("file://")
+                    readonly property bool themeHit: iconStr !== "" && !isPath
+                        && Quickshell.hasThemeIcon(iconStr)
+                    // a path icon that fails to load (typo, deleted file)
+                    // degrades to the letter fallback
+                    property bool pathBroken: false
+                    onIconStrChanged: pathBroken = false
+                    readonly property bool hasIcon: themeHit
+                        || (isPath && !pathBroken)
 
                     Image {
                         id: icon
                         anchors.fill: parent
-                        source: iconBox.hasIcon
-                            ? Quickshell.iconPath(modelData.icon) : ""
+                        source: iconBox.themeHit
+                            ? Quickshell.iconPath(iconBox.iconStr)
+                            : iconBox.isPath
+                                ? "file://" + (iconBox.iconStr.startsWith("file://")
+                                    ? iconBox.iconStr.slice(7)
+                                    : iconBox.iconStr.startsWith("~")
+                                        ? Quickshell.env("HOME") + iconBox.iconStr.slice(1)
+                                        : iconBox.iconStr)
+                                : ""
+                        onStatusChanged: if (status === Image.Error)
+                            iconBox.pathBroken = true
                         sourceSize: Qt.size(width, height)
                         visible: iconBox.hasIcon
                     }

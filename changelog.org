@@ -62,3 +62,58 @@ All notable changes. Project name: ~wheel-hover-launcher~.
 ** Docs
 
 - README.org usage table updated for modifier-gated dwell
+
+* 2026-11-17
+
+** Added
+
+- X11 / i3 support: ~WlrLayershell~ properties set conditionally
+  (attached object is ~null~ on X11)
+- ~IpcHandler~ target ~wheel-hover-launcher~ (~toggle~) —
+  platform-independent toggle; i3 binds it via
+  ~bindsym $mod+X exec --no-startup-id quickshell -p <config dir> ipc call wheel-hover-launcher toggle~
+- README.org: "X11 / i3 setup" section
+- Installed i3 config block (exec + keybind + ~for_window~ rule) in
+  ~~/.config/i3/config~~
+
+** Fixed
+
+- X11 window type: ~PanelWindow~ maps as
+  ~_NET_WM_WINDOW_TYPE_DOCK~ on X11, which i3 never manages (no
+  struts → absent from the i3 tree, ~Withdrawn~ backing window).
+  X11 now uses a ~FloatingWindow~ (normal window type,
+  ~fullscreen: true~) via a platform ~Loader~; shared content
+  component hosted by both window types
+- X11 keyboard: keys never reached the ~Keys~ handler even with X
+  input focus on the window — the content item now calls
+  ~forceActiveFocus()~ when the wheel opens (plus ~focus: root.open~)
+- i3 binding: ~quickshell ipc call~ silently found no instance
+  without ~-p~ (IPC instance selection is per config path); binding
+  and ~exec~ line now pass the config path
+
+** Notes
+
+- Quickshell sets an *empty WM_CLASS* on X11, so the i3 window rule
+  matches by exact title: ~for_window [title="^quickshell$"]~.
+- Verified live on i3/Xorg (SDDM session): toggle opens a fullscreen
+  managed window, Esc closes, app keys launch directly
+  (~execDetached~ → thunar/telegram spawned), Ctrl/Alt + click and
+  Ctrl/Alt + dwell-launch work, click-outside closes. Wayland
+  (Hyprland) path restructured but not yet re-tested live.
+- Tests: ~node tests/keymap.test.js~ 14/14 after the restructure.
+
+** Added (setup + icons)
+
+- ~install.sh~ — first-run setup for new users: checks Quickshell,
+  creates ~~/.config/wheel-hover-launcher/~ and
+  ~~magnus/wheel-hover-launcher/logs/~, seeds ~apps.json~ from
+  ~apps.json.example~ (never overwrites an existing config), prints
+  copy-paste autostart/keybind lines for Hyprland and i3. Idempotent,
+  no ~sudo~.
+- ~apps.json.example~ — portable example config
+  (~~-paths → ~$HOME~ where ~~~ would not expand inside ~sh -c~)
+- README.org: "Quick start (new users)" section and "Icons" section
+- Icon paths: ~apps[].icon~ now also accepts file paths
+  (~/~/rel~, ~/abs~, ~file://~ URLs; PNG/SVG) in addition to XDG
+  theme names; theme-name lookup unchanged, first-letter fallback
+  unchanged.
