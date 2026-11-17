@@ -18,15 +18,15 @@ cd ~/dev/wheel-hover-launcher
 
 ~install.sh~ (safe to re-run, no ~sudo~):
 
-- checks that Quickshell is installed;
-- creates ~~/.config/wheel-hover-launcher/~ and seeds ~apps.json~ from
-  ~apps.json.example~ (an existing config is never overwritten);
-- creates ~~magnus/wheel-hover-launcher/logs/~;
-- prints the exact autostart + keybind lines for Hyprland and i3.
+  - checks that Quickshell is installed;
+  - creates =~/.config/wheel-hover-launcher/= and seeds ~apps.json~ from
+    ~apps.json.example~ (an existing config is never overwritten);
+  - creates =~magnus/wheel-hover-launcher/logs/=;
+  - prints the exact autostart + keybind lines for Hyprland and i3.
 
-Then finish the wiring for your compositor: follow the =Setup=
-(Hyprland, Wayland) or =X11 / i3 setup= sections below,
-reload / re-login, and press ~Super+X~.
+  Then finish the wiring for your compositor: follow the =Setup=
+  (Hyprland, Wayland) or =X11 / i3 setup= sections below,
+  reload / re-login, and press ~Super+X~.
 
 * Features
 
@@ -36,7 +36,7 @@ reload / re-login, and press ~Super+X~.
 - Mouse support: hover to highlight, ~Ctrl~/~Alt~ + left click to launch.
 - Optional Ctrl/Alt hover-to-launch (dwell, default 250ms; plain hover never launches).
 - Idle auto-close after N ms without a key press.
-- User-editable app list in ~~/.config/wheel-hover-launcher/apps.json~, hot-reloaded on save.
+- User-editable app list in =~/.config/wheel-hover-launcher/apps.json=, hot-reloaded on save.
 - Per-app icon from the XDG icon theme (or a custom file path), with a
   first-letter fallback.
 
@@ -54,7 +54,7 @@ reload / re-login, and press ~Super+X~.
 
 1. Install Quickshell (~pacman -S quickshell~).
 
-2. Start the shell once per login. In ~~/.config/hypr/hyprland.lua~, inside
+2. Start the shell once per login. In =~/.config/hypr/hyprland.lua=, inside
    the ~hl.on("hyprland.start", function() ... end)~ block:
 
    #+begin_src lua
@@ -116,7 +116,7 @@ EWMH fullscreen and the i3 rule below enforces it.
    for_window [title="^quickshell$"] floating enable, fullscreen enable
    #+end_src
 
-   (Installed in ~~/.config/i3/config~ already; see the "Wheel Hover
+   (Installed in =~/.config/i3/config= already; see the "Wheel Hover
    Launcher" block at the bottom.)
 
 4. Transparency (the 35% dim behind the wheel) requires a compositing
@@ -153,7 +153,7 @@ anything; only a steady hover with the modifier held reaches ~hoverDelay~
 
 * Configuration — apps.json
 
-Location: ~~/.config/wheel-hover-launcher/apps.json~
+Location: =~/.config/wheel-hover-launcher/apps.json=
 example apps.json could be like
 #+begin_src json
   {
@@ -281,7 +281,7 @@ switches.
   #+begin_src sh
   hyprctl dispatch 'hl.dsp.global("quickshell:wheel-hover-launcher")'
   #+end_src
-- Logs: ~/run/user/$UID/quickshell/by-id/*/log.qslog~.
+- Logs: =/run/user/$UID/quickshell/by-id/*/log.qslog=.
 
 * Project structure
 
