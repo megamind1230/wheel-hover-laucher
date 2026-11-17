@@ -24,8 +24,8 @@ cd ~/dev/wheel-hover-launcher
 - creates ~~magnus/wheel-hover-launcher/logs/~;
 - prints the exact autostart + keybind lines for Hyprland and i3.
 
-Then finish the wiring for your compositor: follow the [[*Setup][Setup]]
-(Hyprland, Wayland) or [[*X11 / i3 setup][X11 / i3 setup]] section below,
+Then finish the wiring for your compositor: follow the =Setup=
+(Hyprland, Wayland) or =X11 / i3 setup= sections below,
 reload / re-login, and press ~Super+X~.
 
 * Features
